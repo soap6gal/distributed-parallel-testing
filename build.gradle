@@ -1,0 +1,59 @@
+buildscript{
+    repositories {
+        maven {
+            url 'http://repo1.maven.org/maven2'
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath "net.serenity-bdd:serenity-gradle-plugin:1.1.40"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "net.serenity-bdd.aggregator"
+
+repositories {
+    maven {
+        url 'http://repo1.maven.org/maven2'
+    }
+    jcenter()
+}
+
+println "project.serenity.outputDirectory= ${project.serenity.outputDirectory}"
+
+dependencies {
+    def SERENITY_VERSION = "1.1.42"
+
+    testCompile (
+            'net.serenity-bdd:serenity-core:' + SERENITY_VERSION,
+            'net.serenity-bdd:serenity-junit:' + SERENITY_VERSION,
+            'net.serenity-bdd:serenity-rest-assured:' + SERENITY_VERSION,
+            'net.serenity-bdd:serenity-cucumber:1.1.9',
+            'io.appium:java-client:4.1.2',
+            'org.assertj:assertj-core:1.7.0',
+            'org.slf4j:slf4j-simple:1.7.7',
+            'org.json:json:20160810',
+            'junit:junit:4.12'
+    )
+}
+
+test {
+    maxParallelForks=System.getProperty("maxParallelForks")
+    testLogging {
+        showStandardStreams = true
+    }
+    /* Pass all system properties: */
+    systemProperties System.getProperties()
+}
+
+task uiTests(type: Test) {
+    includes = ['**/*']
+}
+
+task copyDeps(type: Copy) {
+    from configurations.runtime
+    into project.projectDir.path+"/lib"
+}
+
+gradle.startParameter.continueOnFailure = true
